@@ -1,12 +1,14 @@
 import { connection } from '../database/database.js';
 
 export async function getGames(req,res){
-    let {name} = req.query;
-    let query = `select g.*,c.name as "categoryName" from games g join categories c on c.id = g."categoryId"`
+    let {name,limit,offset} = req.query;
+    let query = `select g.*,c.name as "categoryName" from games g 
+        join categories c on c.id = g."categoryId"
+        ${name===undefined?"":`where LOWER(g."name") like LOWER('${name}%')`}
+        ${limit===undefined?"":`limit ${limit}`}
+        ${offset===undefined?"":`offset ${offset}`}    
+    `
     try{
-        if(name !== undefined){
-            query += `where LOWER(g."name") like LOWER('${name}%')`;
-        }
         const data = await connection.query(query);
         return res.status(200).send(data.rows);
     }

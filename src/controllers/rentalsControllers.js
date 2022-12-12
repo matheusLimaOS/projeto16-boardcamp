@@ -2,7 +2,7 @@ import { connection } from '../database/database.js';
 import { getGames } from './gamesController.js';
 
 export async function getRentals(req,res){
-    let {customerId,gameId} = req.query;
+    let {customerId,gameId,limit,offset} = req.query;
     let query = `select res.* from (
         select r.*,to_json(res2) as customer,to_json(res3) as game from (
           select c.id,c.name from customers c
@@ -14,7 +14,11 @@ export async function getRentals(req,res){
         	join categories c2 on c2.id = g."categoryId"
             ${gameId===undefined?"":`where g.id = ${gameId} `}
         ) res3 on res3.id = r."gameId"
-    ) res;`
+    ) res
+    ${limit===undefined?"":`limit ${limit}`}
+    ${offset===undefined?"":`offset ${offset}`}
+    ;
+    `
     try{
         const data = await connection.query(query);
 

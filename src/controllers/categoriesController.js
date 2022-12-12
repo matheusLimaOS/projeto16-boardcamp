@@ -1,8 +1,13 @@
 import { connection } from '../database/database.js';
 
 export async function getCategories(req,res){
+    let {limit,offset} = req.query;
+    let query = `select * from categories
+        ${limit===undefined?"":`limit ${limit}`}
+        ${offset===undefined?"":`offset ${offset}`}
+    `
     try{
-        const data = await connection.query(`select * from categories`);
+        const data = await connection.query(query);
 
         return res.status(200).send(data.rows);
     }

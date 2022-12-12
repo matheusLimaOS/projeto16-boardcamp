@@ -1,12 +1,13 @@
 import { connection } from '../database/database.js';
 
 export async function getCustomers(req,res){
-    let {cpf} = req.query;
-    let query = `select * from customers c `
+    let {cpf,limit,offset} = req.query;
+    let query = `select * from customers c
+        ${cpf===undefined?"":`where c.cpf like '${cpf}%'`}
+        ${limit===undefined?"":`limit ${limit}`}
+        ${offset===undefined?"":`offset ${offset}`}   
+    `
     try{
-        if(cpf !== undefined){
-            query += `where c.cpf like '${cpf}%'`;
-        }
         const data = await connection.query(query);
         return res.status(200).send(data.rows);
     }
