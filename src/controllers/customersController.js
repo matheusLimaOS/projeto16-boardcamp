@@ -2,8 +2,10 @@ import { connection } from '../database/database.js';
 
 export async function getCustomers(req,res){
     let {cpf,limit,offset,order,desc} = req.query;
-    let query = `select * from customers c
+    let query = `select c.id,c.name,c.phone,c.cpf,TO_CHAR(c.birthday::date, 'yyyy/mm/dd'), count(r.id)::int as rentalsCount  from customers c
+        join rentals r on c.id = r."customerId"
         ${cpf===undefined?"":`where c.cpf like '${cpf}%'`}
+        group by c.id
         ${limit===undefined?"":`limit ${limit}`}
         ${offset===undefined?"":`offset ${offset}`}
         ${order ===undefined?"": `order by ${order} ${desc==='true' ? `desc` :`asc`}`}

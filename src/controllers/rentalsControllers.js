@@ -35,9 +35,9 @@ export async function getRentals(req,res){
 export async function getRentalsMetrics(req,res){
     let {startDate,endDate} = req.query;
     let query = `select 
-                    (sum("originalPrice")+sum("delayFee")) as revenue, 
-                    count(id) as rentals,
-                    ((sum("originalPrice")+sum("delayFee"))/count(id)) as average 
+                    (sum("originalPrice")+sum("delayFee"))::int as revenue, 
+                    count(id)::int as rentals,
+                    ((sum("originalPrice")+sum("delayFee"))/count(id))::int as average 
                 from rentals r
                 ${startDate===undefined ? "" : `where "rentDate" => '${startDate}'`}
                 ${endDate===undefined ? "" : `where "rentDate" <= '${endDate}'`}
