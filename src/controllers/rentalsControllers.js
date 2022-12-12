@@ -1,8 +1,7 @@
 import { connection } from '../database/database.js';
-import { getGames } from './gamesController.js';
 
 export async function getRentals(req,res){
-    let {customerId,gameId,limit,offset,order,desc} = req.query;
+    let {customerId,gameId,limit,offset,order,desc,status,startDate} = req.query;
     let query = `select res.* from (
         select r.*,to_json(res2) as customer,to_json(res3) as game from (
                 select c.id,c.name from customers c
@@ -14,6 +13,8 @@ export async function getRentals(req,res){
                 join categories c2 on c2.id = g."categoryId"
                 ${gameId===undefined?"":`where g.id = ${gameId} `}
             ) res3 on res3.id = r."gameId"
+            ${status===undefined ? "" : status==='open' ? `where "returnDate" IS NULL` : `where "returnDate" IS NOT NULL`}
+            ${startDate===undefined ? "" : `where "rentDate" > '${startDate}'`}
         ) res
         ${limit===undefined?"":`limit ${limit}`}
         ${offset===undefined?"":`offset ${offset}`}
@@ -31,6 +32,28 @@ export async function getRentals(req,res){
     }
 }
 
+export async function getRentalsMetrics(req,res){
+    let {startDate,endDate} = req.query;
+    let query = `select 
+                    (sum("originalPrice")+sum("delayFee")) as revenue, 
+                    count(id) as rentals,
+                    ((sum("originalPrice")+sum("delayFee"))/count(id)) as average 
+                from rentals r
+                ${startDate===undefined ? "" : `where "rentDate" => '${startDate}'`}
+                ${endDate===undefined ? "" : `where "rentDate" <= '${endDate}'`}
+    ;
+    `
+    try{
+        const data = await connection.query(query);
+
+        return res.status(200).send(data.rows[0]);
+    }
+    catch(e){
+        console.log(e);
+        return res.status(500).send("Erro interno do sistema");
+    }
+}
+ 
 export async function insertRental(req,res){
     try{
         let {customerId,gameId,daysRented,price} = res.locals.rental;
