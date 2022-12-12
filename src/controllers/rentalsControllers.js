@@ -3,7 +3,7 @@ import { connection } from '../database/database.js';
 export async function getRentals(req,res){
     let {customerId,gameId,limit,offset,order,desc,status,startDate} = req.query;
     let query = `select res.* from (
-        select r.*,to_json(res2) as customer,to_json(res3) as game from (
+        select r.id, r."customerId",r."gameId",TO_CHAR(r."rentDate"::date, 'yyyy/mm/dd') as "rentDate",r."daysRented",TO_CHAR(r."returnDate"::date, 'yyyy/mm/dd') as "returnDate",r."originalPrice",r."delayFee", to_json(res2) as customer,to_json(res3) as game from (
                 select c.id,c.name from customers c
                 ${customerId===undefined ?"" :` where c.id = ${customerId} `}
             ) res2

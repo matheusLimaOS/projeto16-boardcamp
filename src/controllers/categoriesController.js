@@ -7,7 +7,6 @@ export async function getCategories(req,res){
         ${offset===undefined?"":`offset ${offset}`}
         ${order ===undefined?"": `order by ${order} ${desc==='true' ? `desc` :`asc`}`}
     `
-    console.log(typeof desc, query)
     try{
         const data = await connection.query(query);
 
