@@ -1,11 +1,12 @@
 import { connection } from '../database/database.js';
 
 export async function getCustomers(req,res){
-    let {cpf,limit,offset} = req.query;
+    let {cpf,limit,offset,order,desc} = req.query;
     let query = `select * from customers c
         ${cpf===undefined?"":`where c.cpf like '${cpf}%'`}
         ${limit===undefined?"":`limit ${limit}`}
-        ${offset===undefined?"":`offset ${offset}`}   
+        ${offset===undefined?"":`offset ${offset}`}
+        ${order ===undefined?"": `order by ${order} ${desc==='true' ? `desc` :`asc`}`}
     `
     try{
         const data = await connection.query(query);
