@@ -13,9 +13,7 @@ export async function verifyRental(req,res,next){
     const verifyGame = await connection.query(`select * from games where id = ${gameId}`);
     const verifyCustomer = await connection.query(`select * from customers where id = ${customerId}`);
     const quantJogosAlugados = await connection.query(`select count(id) from rentals where "gameId" = ${gameId} and "returnDate" IS NULL`);
-
-    console.log(verifyGame.rows[0].stockTotal,Number(quantJogosAlugados.rows[0].count))
-
+    
     if(verifyGame.rows.length === 0){
         return res.status(400).send("Jogo não encontrado!");
     }

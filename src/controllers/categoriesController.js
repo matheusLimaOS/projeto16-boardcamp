@@ -1,8 +1,14 @@
 import { connection } from '../database/database.js';
 
 export async function getCategories(req,res){
+    let {limit,offset,order,desc} = req.query;
+    let query = `select * from categories
+        ${limit===undefined?"":`limit ${limit}`}
+        ${offset===undefined?"":`offset ${offset}`}
+        ${order ===undefined?"": `order by ${order} ${desc==='true' ? `desc` :`asc`}`}
+    `
     try{
-        const data = await connection.query(`select * from categories`);
+        const data = await connection.query(query);
 
         return res.status(200).send(data.rows);
     }
