@@ -5,8 +5,8 @@ export async function getGames(req,res){
     let query = `select g.*,c.name as "categoryName" , count(r.id)::int as rentalsCount  from games g
         left join rentals r on g.id  = r."gameId"
         join categories c on c.id = g."categoryId"
-        group by g.id, c."name" 
         ${name===undefined?"":`where LOWER(g."name") like LOWER('${name}%')`}
+        group by g.id, c."name" 
         ${limit===undefined?"":`limit ${limit}`}
         ${offset===undefined?"":`offset ${offset}`}
         ${order ===undefined?"": `order by ${order} ${desc==='true' ? `desc ` :`asc `}`}
